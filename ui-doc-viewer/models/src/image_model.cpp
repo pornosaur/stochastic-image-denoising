@@ -19,7 +19,6 @@ cv::Mat qmodel::ImageModel::convert_to_mat(const QImage &img) {
             break;
         case QImage::Format_RGB888:
             mat = cv::Mat(img.height(), img.width(), CV_8UC3, (void *) img.constBits(), img.bytesPerLine());
-            cv::cvtColor(mat, mat, cv::COLOR_BGR2RGB);
             break;
         case QImage::Format_Grayscale8:
             mat = cv::Mat(img.height(), img.width(), CV_8UC1, (void *) img.constBits(), img.bytesPerLine());
@@ -31,7 +30,7 @@ cv::Mat qmodel::ImageModel::convert_to_mat(const QImage &img) {
             break;
     }
 
-    return mat;
+    return mat.clone();
 }
 
 qmodel::ImageModel::ImageModel(QString img_path) : m_img_path(std::move(img_path)) {
@@ -68,7 +67,7 @@ QImage qmodel::ImageModel::mat_to_qimage2(const cv::Mat &inMat) {
             return QImage(inMat.data,
                           inMat.cols, inMat.rows,
                           static_cast<int>(inMat.step),
-                          QImage::Format_ARGB32);
+                          QImage::Format_ARGB32).copy();
 
         }
 
@@ -77,7 +76,7 @@ QImage qmodel::ImageModel::mat_to_qimage2(const cv::Mat &inMat) {
             return QImage(inMat.data,
                           inMat.cols, inMat.rows,
                           static_cast<int>(inMat.step),
-                          QImage::Format_RGB888);
+                          QImage::Format_RGB888).copy();
 
         }
 
@@ -87,7 +86,7 @@ QImage qmodel::ImageModel::mat_to_qimage2(const cv::Mat &inMat) {
             return QImage(reinterpret_cast<const uchar *>(m.data),
                           inMat.cols, inMat.rows,
                           static_cast<int>(inMat.step),
-                          QImage::Format_Grayscale8);
+                          QImage::Format_Grayscale8).copy();
         }
 
         default:
